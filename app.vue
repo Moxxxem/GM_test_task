@@ -1,8 +1,15 @@
 <template>
   <div>
     <AppHeader />
+    <MainSection />
   </div>
 </template>
+
+<script>
+export default {
+
+}
+</script>
 
 <style>
 body {

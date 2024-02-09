@@ -3,12 +3,12 @@
     <span class="header__title">My amazing website</span>
     <div class="actions header__actions">
       <div class="actions__buttons-group buttons-group">
-        <button class="buttons-group__anchor">1</button>
-        <button class="buttons-group__anchor">2</button>
+        <a href="#first-section" class="buttons-group__anchor">1</a>
+        <a href="#second-section" class="buttons-group__anchor">2</a>
       </div>
       <select class="actions__select">
-        <option>EN</option>
         <option>RU</option>
+        <option>EN</option>
         <option>LV</option>
       </select>
     </div>
@@ -20,6 +20,8 @@ export default {}
 </script>
 <style lang="scss">
 .header {
+  position: sticky;
+  top: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
