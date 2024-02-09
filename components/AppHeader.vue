@@ -1,22 +1,40 @@
 <template>
   <header class="header container">
-    <span class="header__title">My amazing website</span>
+    <span class="header__title">{{ currentDictionary.header.title }}</span>
     <div class="actions header__actions">
       <div class="actions__buttons-group buttons-group">
-        <a href="#first-section" class="buttons-group__anchor">1</a>
-        <a href="#second-section" class="buttons-group__anchor">2</a>
+        <a href="#first-section" class="buttons-group__anchor">
+          {{ currentDictionary.mainContent.firstSection.title }}
+        </a>
+        <a href="#second-section" class="buttons-group__anchor">
+          {{ currentDictionary.mainContent.secondSection.title }}
+        </a>
       </div>
-      <select class="actions__select">
-        <option>RU</option>
-        <option>EN</option>
-        <option>LV</option>
+      <select v-model="selectedLanguage" @change="onLanguageChange" class="actions__select">
+        <option value="ru">RU</option>
+        <option value="en">EN</option>
+        <option value="pl">PL</option>
       </select>
     </div>
   </header>
 </template>
 
 <script>
-export default {}
+export default {
+  name: 'AppHeader',
+  props: {
+    currentLanguage: String,
+    currentDictionary: Object
+  },
+  setup(props, context) {
+    const selectedLanguage = ref(props.currentLanguage)
+    const onLanguageChange = () => {
+      context.emit('change-language', selectedLanguage)
+    }
+
+    return { selectedLanguage, onLanguageChange }
+  }
+}
 </script>
 <style lang="scss">
 .header {
