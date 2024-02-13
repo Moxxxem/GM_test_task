@@ -1,48 +1,94 @@
 <template>
   <header class="header container">
-    <span class="header__title">{{ currentDictionary.header.title }}</span>
+    <EditableText
+      v-model="header.title"
+      class="header__title"
+      path="header.title"
+      :current-language="currentLanguage"
+      tag="p"
+    />
     <div class="actions header__actions">
-      <div class="actions__buttons-group buttons-group">
-        <a href="#first-section" class="buttons-group__anchor">
-          {{ currentDictionary.mainContent.firstSection.title }}
+      <nav class="actions__nav-group nav-group">
+        <a class="nav-group__anchor" href="#first-section">
+          {{ firstSectionTitle }}
         </a>
-        <a href="#second-section" class="buttons-group__anchor">
-          {{ currentDictionary.mainContent.secondSection.title }}
+        <a class="nav-group__anchor" href="#second-section">
+          {{ secondSectionTitle }}
         </a>
-      </div>
-      <select v-model="selectedLanguage" @change="onLanguageChange" class="actions__select">
-        <option value="ru">RU</option>
-        <option value="en">EN</option>
-        <option value="pl">PL</option>
-      </select>
-      <div class="actions__user user" v-if="user.first_name" @click="changeUserAvatar">
+      </nav>
+      <button v-if="user" class="actions__user user" @click="changeUserAvatar">
         <img v-if="userAvatar" class="user__image" :src="user.avatar" />
-        <span v-else class="user__name">{{ user.first_name[0] }} {{ user.last_name[0] }}</span>
-      </div>
+        <span v-else class="user__name">{{ userInitials }}</span>
+      </button>
+      <select v-model="selectedLanguage" class="actions__select" @change="onLanguageChange">
+        <option v-for="(language, index) in languages" :key="index">{{ language }}</option>
+      </select>
     </div>
   </header>
 </template>
 
 <script>
+import EditableText from './EditableText.vue'
+
 export default {
   name: 'AppHeader',
+  components: { EditableText },
   props: {
-    user: Object,
-    currentLanguage: String,
-    currentDictionary: Object
+    user: {
+      type: Object,
+      default: () => {
+        return null
+      }
+    },
+    currentLanguage: {
+      type: String,
+      default: 'ru'
+    },
+    currentDictionary: {
+      type: Object,
+      default: () => {
+        return null
+      }
+    }
   },
   setup(props, context) {
+    const languages = ['ru', 'en', 'pl']
     let userAvatar = ref(false) // false === text
     const selectedLanguage = ref(props.currentLanguage)
+
+    const header = computed(() => props.currentDictionary.header)
+
+    watch(
+      () => header,
+      () => {
+        context.emit('update')
+      },
+      { deep: true }
+    )
+    const userInitials = computed(() => {
+      return Object.keys(props.user).length ? props.user.first_name[0] + props.user.last_name[0] : null
+    })
+
+    const firstSectionTitle = computed(() => props.currentDictionary.mainContent.firstSection.title)
+    const secondSectionTitle = computed(() => props.currentDictionary.mainContent.secondSection.title)
     const onLanguageChange = () => {
       context.emit('change-language', selectedLanguage)
     }
-
     const changeUserAvatar = () => {
       userAvatar.value = !userAvatar.value
     }
 
-    return { selectedLanguage, userAvatar, onLanguageChange, changeUserAvatar }
+    return {
+      languages,
+      selectedLanguage,
+      userAvatar,
+      header,
+      userInitials,
+      firstSectionTitle,
+      secondSectionTitle,
+      onLanguageChange,
+      changeUserAvatar
+    }
   }
 }
 </script>
@@ -67,11 +113,15 @@ export default {
   align-items: center;
 }
 
-.buttons-group {
+.nav-group {
   display: flex;
   gap: 4px;
   &__anchor {
     cursor: pointer;
+    max-width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     background-color: #03b5aa;
     color: #f9f8f8;
     border: none;
@@ -81,6 +131,8 @@ export default {
 
 .user {
   cursor: pointer;
+  border: none;
+  padding: 0;
   background-color: #03b5aa;
   color: #f9f8f8;
   height: 35px;

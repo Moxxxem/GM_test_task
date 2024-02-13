@@ -1,4 +1,4 @@
-const DICTIONARY = {
+const DICTIONARY = Object.freeze({
   ru: {
     header: {
       title: 'Мой прекрасный вебсайт'
@@ -44,6 +44,6 @@ const DICTIONARY = {
       }
     }
   }
-}
+})
 
 export default DICTIONARY
