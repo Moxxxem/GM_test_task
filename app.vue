@@ -2,11 +2,12 @@
   <div v-if="currentDictionary && user">
     <AppHeader
       :user="user"
-      :currentDictionary="currentDictionary"
-      :currentLanguage="currentLanguage"
+      :current-dictionary="currentDictionary"
+      :current-language="currentLanguage"
       @change-language="onChangeLanguage"
+      @update="onUpdate"
     />
-    <MainSection :currentDictionary="currentDictionary" />
+    <MainSection :current-dictionary="currentDictionary" @update="onUpdate" />
   </div>
 </template>
 
@@ -18,7 +19,11 @@ export default {
     const user = ref({})
 
     const getUser = async () => {
-      await $fetch('https://reqres.in/api/users/1').then((response) => (user.value = response.data))
+      await $fetch('https://reqres.in/api/users/1')
+        .then((response) => (user.value = response.data))
+        .catch((error) => {
+          console.log(error.message)
+        })
     }
 
     onBeforeMount(() => {
@@ -34,16 +39,29 @@ export default {
       currentDictionary.value = JSON.parse(localStorage.getItem(`dictionary-${language.value}`))
     }
 
-    return { currentDictionary, currentLanguage, user, onChangeLanguage }
+    const onUpdate = () => {
+      localStorage.setItem(`dictionary-${currentLanguage.value}`, JSON.stringify(currentDictionary.value))
+    }
+
+    return { currentDictionary, currentLanguage, user, onChangeLanguage, onUpdate }
   }
 }
 </script>
 
 <style>
+* {
+  box-sizing: content-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   background-color: #f9f8f8;
 }
+
 .container {
   padding: 0 8px;
 }
